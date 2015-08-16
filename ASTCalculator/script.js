@@ -8,15 +8,16 @@ window.onload = function(){
 
     Node.prototype.draw = function() {
         var interDraw = function(nod, parent) {		
-            var disp = document.createElement("li");
             var text = document.createTextNode(nod.text);
+            var disp = document.createElement("li");
             disp.appendChild(text);
-            var ul = document.createElement("ul");
             parent.appendChild(disp);
-            var dispParent = parent.appendChild(ul);
+
+            var ul = document.createElement("ul");
+            parent.appendChild(ul);
    		
-            if (nod.left) interDraw(nod.left, dispParent);
-            if (nod.right) interDraw(nod.right, dispParent);
+            if (nod.left) interDraw(nod.left, ul);
+            if (nod.right) interDraw(nod.right, ul);
         }	
         interDraw(this, document.getElementById("disproot"));	
     }	
