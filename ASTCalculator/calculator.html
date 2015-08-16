@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Calculator</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="script.js"></script>
+</head>
+<body>
+<div class="usage">
+    <p>
+    This calculator evaluates simple expressions that supports +, -, *, / on non-negative integers. 
+    It also prints out <strong>Abstract Syntax Tree</strong>.
+
+    The implementation uses recursive descent analysis.
+
+    Example Input: 5 * (3 - 2) / 5			
+    </p>
+</div>
+<div class="calc">
+   <div class="display"></div>
+    <div class="button">7</div>
+    <div class="button">8</div>
+    <div class="button">9</div>
+    <div class="button">/</div>
+    <div class="button">4</div>
+    <div class="button">5</div>
+    <div class="button">6</div>
+    <div class="button">*</div>
+    <div class="button">1</div>
+    <div class="button">2</div>
+    <div class="button">3</div>
+    <div class="button">-</div>
+    <div class="button">0</div>
+    <div class="button">(</div>
+    <div class="button">)</div>
+    <div class="button">+</div>
+    <div class="button">C</div>
+    <div class="button">=</div>
+</div>
+<div class="ast">
+<p> Abstract Syntax Tree</p>
+<p id="disproot"></p>
+</div>
+</body>
+</html>
