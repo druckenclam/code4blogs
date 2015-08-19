@@ -1,8 +1,8 @@
 import sys
 import json
 
-# The implementation is a quick and dirty prototype finished in hours while I am learning
-# dxf format 
+# The implementation is a quick and dirty prototype for me to understand
+# dxf format. OO features are not used so it's easy to compare with C code 
 
 DBG_VERBOSE = False
 DBG_COUNTER = None
@@ -76,7 +76,7 @@ class Entity:
         self.subclass_maker = None
         self.layer_name = None
         self.linetype_name = None
-        self.color_name = None
+        self.color_number = None
         self.line_weight = None
         self.points_x = {}
         self.points_y = {}
@@ -117,11 +117,11 @@ def dxf_process_entities(stack, entity_section, args):
 
     if code == 62:
         dxf_assert(isinstance(stack[-1], Entity), counter)
-        stack[-1].color_name = data
+        stack[-1].color_number = data
 
     if code == 370:
         dxf_assert(isinstance(stack[-1], Entity), counter)
-        stack[-1].lineweight = data
+        stack[-1].line_weight = data
 
     if 10 <= code <= 18:
         dxf_assert(isinstance(stack[-1], Entity), counter)
