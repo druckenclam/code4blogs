@@ -10,3 +10,8 @@ It demonstrates how autoreload is implemented by Django.
 http://druckenclam.blogspot.com.au/2015/08/a-calculator-that-builds-up-abstract.html
 
 A calculator capable of printing abstract syntax tree.
+
+3. AutoCAD_dxf_transformer
+http://druckenclam.blogspot.com.au/2015/08/autocad-dxf-transformer.html
+
+A programm that reads DXF format from AutoCAD and output json | html | txt files
