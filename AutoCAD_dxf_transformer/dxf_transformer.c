@@ -20,10 +20,14 @@ int main(int argc, char* argv[]) {
         Dxf* root = dxfProcessDocument(f);
         assert(root);
         dxfConvert2JSON(root);
+        dxfDestroy(root);
     } else if (!strcmp(argv[2], "txt")) {
         dxfTokenizeDocument(f);
     } else if (!strcmp(argv[2], "html")) {
-        
+        Dxf* root = dxfProcessDocument(f);
+        assert(root);
+        dxfConvert2HTML(root);
+        dxfDestroy(root);
     } else {
         usage(argv[0]);
         fclose(f);

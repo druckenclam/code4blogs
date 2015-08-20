@@ -1,126 +1,117 @@
 {
-  "comments": "", 
-  "dxf_file_name": "box.dxf", 
+  "comments": "",
   "sections": [
     {
-      "_end_counter": 87, 
-      "_start_counter": 1, 
-      "entities": [], 
+      "_end_counter": 87,
+      "_start_counter": 1,
+      "entities": [],
       "type": "HEADER"
-    }, 
+    },
     {
-      "_end_counter": 90, 
-      "_start_counter": 88, 
-      "entities": [], 
-      "type": "CLASSES"
-    }, 
+      "_end_counter": 90,
+      "_start_counter": 88,
+      "entities": [],
+      "type": ""
+    },
     {
-      "_end_counter": 711, 
-      "_start_counter": 91, 
-      "entities": [], 
+      "_end_counter": 711,
+      "_start_counter": 91,
+      "entities": [],
       "type": "TABLES"
-    }, 
+    },
     {
-      "_end_counter": 752, 
-      "_start_counter": 712, 
-      "entities": [], 
+      "_end_counter": 752,
+      "_start_counter": 712,
+      "entities": [],
       "type": "BLOCKS"
-    }, 
+    },
     {
-      "_end_counter": 803, 
-      "_start_counter": 753, 
+      "_end_counter": 803,
+      "_start_counter": 753,
       "entities": [
         {
-          "_end_counter": 766, 
-          "_start_counter": 755, 
-          "color_name": "256", 
-          "handle": "46", 
-          "layer_name": "0", 
-          "line_weight": null, 
-          "linetype_name": "ByLayer", 
-          "lineweight": "-1", 
+          "_end_counter": 766,
+          "_start_counter": 755,
+          "color_number": "256",
+          "handle": "46",
+          "layer_name": "0",
+          "linetype_name": "ByLayer",
+          "line_weight": "-1",
           "points_x": {
-            "10": 100.0, 
-            "11": 200.0
-          }, 
+            "10": 100.000000,
+            "11": 200.000000
+          },
           "points_y": {
-            "20": 130.0, 
-            "21": 130.0
-          }, 
-          "points_z": {}, 
-          "subclass_maker": "AcDbLine", 
+            "20": 130.000000,
+            "21": 130.000000
+          },
+          "subclass_maker": "AcDbLine",
           "type": "LINE"
-        }, 
+        },
         {
-          "_end_counter": 778, 
-          "_start_counter": 767, 
-          "color_name": "256", 
-          "handle": "47", 
-          "layer_name": "0", 
-          "line_weight": null, 
-          "linetype_name": "ByLayer", 
-          "lineweight": "-1", 
+          "_end_counter": 778,
+          "_start_counter": 767,
+          "color_number": "256",
+          "handle": "47",
+          "layer_name": "0",
+          "linetype_name": "ByLayer",
+          "line_weight": "-1",
           "points_x": {
-            "10": 200.0, 
-            "11": 200.0
-          }, 
+            "10": 200.000000,
+            "11": 200.000000
+          },
           "points_y": {
-            "20": 130.0, 
-            "21": 100.0
-          }, 
-          "points_z": {}, 
-          "subclass_maker": "AcDbLine", 
+            "20": 130.000000,
+            "21": 100.000000
+          },
+          "subclass_maker": "AcDbLine",
           "type": "LINE"
-        }, 
+        },
         {
-          "_end_counter": 790, 
-          "_start_counter": 779, 
-          "color_name": "256", 
-          "handle": "48", 
-          "layer_name": "0", 
-          "line_weight": null, 
-          "linetype_name": "ByLayer", 
-          "lineweight": "-1", 
+          "_end_counter": 790,
+          "_start_counter": 779,
+          "color_number": "256",
+          "handle": "48",
+          "layer_name": "0",
+          "linetype_name": "ByLayer",
+          "line_weight": "-1",
           "points_x": {
-            "10": 200.0, 
-            "11": 100.0
-          }, 
+            "10": 200.000000,
+            "11": 100.000000
+          },
           "points_y": {
-            "20": 100.0, 
-            "21": 100.0
-          }, 
-          "points_z": {}, 
-          "subclass_maker": "AcDbLine", 
+            "20": 100.000000,
+            "21": 100.000000
+          },
+          "subclass_maker": "AcDbLine",
           "type": "LINE"
-        }, 
+        },
         {
-          "_end_counter": 803, 
-          "_start_counter": 791, 
-          "color_name": "256", 
-          "handle": "49", 
-          "layer_name": "0", 
-          "line_weight": null, 
-          "linetype_name": "ByLayer", 
-          "lineweight": "-1", 
+          "_end_counter": 802,
+          "_start_counter": 791,
+          "color_number": "256",
+          "handle": "49",
+          "layer_name": "0",
+          "linetype_name": "ByLayer",
+          "line_weight": "-1",
           "points_x": {
-            "10": 100.0, 
-            "11": 100.0
-          }, 
+            "10": 100.000000,
+            "11": 100.000000
+          },
           "points_y": {
-            "20": 100.0, 
-            "21": 130.0
-          }, 
-          "points_z": {}, 
-          "subclass_maker": "AcDbLine", 
+            "20": 100.000000,
+            "21": 130.000000
+          },
+          "subclass_maker": "AcDbLine",
           "type": "LINE"
         }
-      ], 
+      ],
       "type": "ENTITIES"
-    }, 
+    },
     {
-      "_end_counter": 818, 
-      "_start_counter": 804, 
-      "entities": [], 
+      "_end_counter": 818,
+      "_start_counter": 804,
+      "entities": [],
       "type": "OBJECTS"
     }
   ]

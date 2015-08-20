@@ -191,11 +191,44 @@ Dxf* dxfProcessDocument(FILE* dxfFile) {
 } 
 
 void dxfConvert2HTML(Dxf* pDxf) {
+    Section* pSection = NULL;
     assert(pDxf);
-        
+    for (pSection = pDxf->pSectionHead; pSection; pSection = pSection->next) {
+        Entity* pEntity = NULL;
+        if (strcmp(pSection->type, "ENTITIES")) continue;
+        printf(
+            "<!DOCTYPE html>\n"
+            "<html>\n"
+            "   <header><title>Convert DXF file to HTML5 Canvas Drawing</title></header>\n"
+            "   <body>\n"
+            "       <canvas id=\"myCanvas\" width=\"640\" height=\"480\" style=\"border:5px;\">\n"
+            "       Your browser does not support the HTML5 canvas tag.</canvas>\n"
+            "       <script>\n"
+            "           var c = document.getElementById(\"myCanvas\");\n"
+            "           var ctx = c.getContext(\"2d\");\n"
+        );
+        for (pEntity = pSection->pEntityHead; pEntity; pEntity = pEntity->next) {
+            if (strcmp(pEntity->type, "LINE")) continue;
+            /* We are dealing with LINE here */
+            /* Asume only two points for a LINE */
+            printf("           ctx.moveTo(%d, %d)\n", (int)pEntity->points_x[0], 
+                (int)pEntity->points_y[0]);
+            printf("           ctx.lineTo(%d, %d)\n", (int)pEntity->points_x[1], 
+                (int)pEntity->points_y[1]);
+        }
+        printf(
+            "           ctx.stroke();\n"
+            "       </script>\n"
+            "   </body>\n"
+            "</html>\n"
+        );
+        /* There is only one ENTITIES section */
+        break;    
+    }    
 }
 
 void dxfConvert2JSON(Dxf* pDxf) {
+    assert(pDxf);
     Section* pSection = NULL;
     printf("{\n");
     printf("  \"comments\": \"%s\",\n", pDxf->comments);
@@ -212,12 +245,15 @@ void sectionConvert2JSON(Section* pSection, int indentLevel, bool last) {
     char space = ' ';
     Entity* pEntity = NULL;
     printf("%*c{\n", indentLevel * 2, space);
-    printf("%*c\"_end_counter\": %llu,\n", (indentLevel + 1) * 2, space, pSection->endCounter);
-    printf("%*c\"_start_counter\": %llu,\n", (indentLevel + 1) * 2, space, pSection->startCounter);
+    printf("%*c\"_end_counter\": %llu,\n", (indentLevel + 1) * 2, space, 
+        pSection->endCounter);
+    printf("%*c\"_start_counter\": %llu,\n", (indentLevel + 1) * 2, space, 
+        pSection->startCounter);
     if (!strcmp(pSection->type, "ENTITIES")) {
         printf("%*c\"entities\": [\n", (indentLevel + 1) * 2, space);
         for (pEntity = pSection->pEntityHead; pEntity; pEntity = pEntity->next) {
-            entityConvert2JSON(pEntity, indentLevel + 2, pEntity == pSection->pEntityTail); 
+            entityConvert2JSON(pEntity, indentLevel + 2, 
+                pEntity == pSection->pEntityTail); 
         }
         printf("%*c],\n", (indentLevel + 1) * 2, space);     
     } else {
@@ -235,18 +271,26 @@ void sectionConvert2JSON(Section* pSection, int indentLevel, bool last) {
 void entityConvert2JSON(Entity* pEntity, int indentLevel, bool last) {
     char space = ' ';
     printf("%*c{\n", indentLevel * 2, space);
-    printf("%*c\"_end_counter\": %llu,\n", (indentLevel + 1) * 2, space, pEntity->endCounter);
-    printf("%*c\"_start_counter\": %llu,\n", (indentLevel + 1) * 2, space, pEntity->startCounter);
-    printf("%*c\"color_number\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->color_number);
-    printf("%*c\"handle\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->handle);
-    printf("%*c\"layer_name\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->layer_name);
-    printf("%*c\"linetype_name\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->linetype_name);
-    printf("%*c\"line_weight\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->line_weight);
+    printf("%*c\"_end_counter\": %llu,\n", (indentLevel + 1) * 2, space, 
+        pEntity->endCounter);
+    printf("%*c\"_start_counter\": %llu,\n", (indentLevel + 1) * 2, space, 
+        pEntity->startCounter);
+    printf("%*c\"color_number\": \"%s\",\n", (indentLevel + 1) * 2, space, 
+        pEntity->color_number);
+    printf("%*c\"handle\": \"%s\",\n", (indentLevel + 1) * 2, space, 
+        pEntity->handle);
+    printf("%*c\"layer_name\": \"%s\",\n", (indentLevel + 1) * 2, space, 
+        pEntity->layer_name);
+    printf("%*c\"linetype_name\": \"%s\",\n", (indentLevel + 1) * 2, space, 
+        pEntity->linetype_name);
+    printf("%*c\"line_weight\": \"%s\",\n", (indentLevel + 1) * 2, space, 
+        pEntity->line_weight);
     if (!strcmp(pEntity->type, "LINE")) {
         int i;
         printf("%*c\"points_x\": {\n", (indentLevel + 1) * 2, space);
         for (i = 0; i < pEntity->numOfPointsX; ++i) {
-            printf("%*c\"%d\": %lf", (indentLevel + 2) * 2, space, i + 10, pEntity->points_x[i]);
+            printf("%*c\"%d\": %lf", (indentLevel + 2) * 2, space, i + 10, 
+                pEntity->points_x[i]);
             if (i == pEntity->numOfPointsX - 1) {
                 printf("\n");
             } else {
@@ -256,7 +300,8 @@ void entityConvert2JSON(Entity* pEntity, int indentLevel, bool last) {
         printf("%*c},\n", (indentLevel + 1) * 2, space);
         printf("%*c\"points_y\": {\n", (indentLevel + 1) * 2, space);
         for (i = 0; i < pEntity->numOfPointsY; ++i) {
-            printf("%*c\"%d\": %lf", (indentLevel + 2) * 2, space, i + 20, pEntity->points_y[i]);
+            printf("%*c\"%d\": %lf", (indentLevel + 2) * 2, space, i + 20, 
+                pEntity->points_y[i]);
             if (i == pEntity->numOfPointsY - 1) {
                 printf("\n");
             } else {
@@ -265,7 +310,8 @@ void entityConvert2JSON(Entity* pEntity, int indentLevel, bool last) {
         }
         printf("%*c},\n", (indentLevel + 1) * 2, space);
     }
-    printf("%*c\"subclass_maker\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->subclass_maker);
+    printf("%*c\"subclass_maker\": \"%s\",\n", (indentLevel + 1) * 2, space, 
+        pEntity->subclass_maker);
     printf("%*c\"type\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->type);
     printf("%*c}", indentLevel * 2, space);
     if (last) {
@@ -273,6 +319,11 @@ void entityConvert2JSON(Entity* pEntity, int indentLevel, bool last) {
     } else {
         printf(",\n");
     }  
+}
+
+/* Release memory */
+void dxfDestroy(Dxf* pDxf) {
+    /* TODO: Traverse objects and free memory */
 }
 
 Entity* makeEntity(unsigned long long counter) {
@@ -352,7 +403,8 @@ struct CodeData readCodeData(FILE* dxfFile, bool disp) {
     codeData.data[strlen(codeData.data) - 1] = '\0';
     
     if (disp) {
-        fprintf(stderr, "%llu: \"%d\" = \"%s\"\n", codeData.counter, codeData.code, codeData.data);
+        printf("%llu: \"%d\" = \"%s\"\n", codeData.counter, codeData.code, 
+            codeData.data);
     }
     
     ++counter;
