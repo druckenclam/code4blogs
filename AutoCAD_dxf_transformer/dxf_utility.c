@@ -101,12 +101,21 @@ static void stackPush(StackItem stackItem);
 static bool stackEmpty(void);
 static void stackPop(void);
 static StackItem stackTop(void);
-static struct CodeData readCodeData(FILE* dxfFile);
+static struct CodeData readCodeData(FILE* dxfFile, bool disp);
 static void dxfProcessEntities(CodeData* pCodeData);
 void sectionConvert2JSON(Section* pSection, int indentLevel, bool last);
 void entityConvert2JSON(Entity* pEntity, int indentLevel, bool last);
 
 /* External Functions */
+void dxfTokenizeDocument(FILE* dxfFile) {
+    while (1) {
+        CodeData codeData = readCodeData(dxfFile, true);   
+        if ((codeData.code == 0) && (!strcmp(codeData.data, "EOF"))) {
+            break;
+        }
+    }    
+}
+
 Dxf* dxfProcessDocument(FILE* dxfFile) {
     Dxf* root = makeDxf();
     StackItem stackItem = {root, Dxf_OBJ};
@@ -114,7 +123,7 @@ Dxf* dxfProcessDocument(FILE* dxfFile) {
     
     Section* pCurrentSection = NULL;
     while (1) {
-        CodeData codeData = readCodeData(dxfFile);   
+        CodeData codeData = readCodeData(dxfFile, false);   
         if ((codeData.code == 0) && (!strcmp(codeData.data, "EOF"))) {
             assert(SAFE_CAST_TO(Dxf, stackTop()));
             stackPop();
@@ -319,7 +328,7 @@ StackItem stackTop(void) {
     return stackItem;    
 }
 
-struct CodeData readCodeData(FILE* dxfFile) {
+struct CodeData readCodeData(FILE* dxfFile, bool disp) {
     /* 
         static variable keeps track of counter
     */
@@ -342,8 +351,8 @@ struct CodeData readCodeData(FILE* dxfFile) {
     assert(ret);
     codeData.data[strlen(codeData.data) - 1] = '\0';
     
-    if (DEBUG) {
-        fprintf(stderr, "[DBG] %llu: '%d' = '%s'\n", codeData.counter, codeData.code, codeData.data);
+    if (disp) {
+        fprintf(stderr, "%llu: \"%d\" = \"%s\"\n", codeData.counter, codeData.code, codeData.data);
     }
     
     ++counter;

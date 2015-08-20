@@ -3,4 +3,5 @@
 typedef struct Dxf Dxf;
 Dxf* dxfProcessDocument(FILE* dxfFile);
 void dxfConvert2JSON(Dxf* pDxf);
+void dxfTokenizeDocument(FILE* dxfFile);
 #endif
