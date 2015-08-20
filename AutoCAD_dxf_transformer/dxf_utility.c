@@ -42,7 +42,9 @@ typedef struct Entity {
     double points_x[NUM_OF_POINTS];   
     double points_y[NUM_OF_POINTS];
     double points_z[NUM_OF_POINTS];
-    int numOfPoins;
+    int numOfPointsX;
+    int numOfPointsY;
+    int numOfPointsZ;
     
     /* Next Pointer */
     struct Entity* next;
@@ -201,8 +203,8 @@ void sectionConvert2JSON(Section* pSection, int indentLevel, bool last) {
     char space = ' ';
     Entity* pEntity = NULL;
     printf("%*c{\n", indentLevel * 2, space);
-    printf("%*c\"_end_counter\": %llu\n", (indentLevel + 1) * 2, space, pSection->endCounter);
-    printf("%*c\"_start_counter\": %llu\n", (indentLevel + 1) * 2, space, pSection->startCounter);
+    printf("%*c\"_end_counter\": %llu,\n", (indentLevel + 1) * 2, space, pSection->endCounter);
+    printf("%*c\"_start_counter\": %llu,\n", (indentLevel + 1) * 2, space, pSection->startCounter);
     if (!strcmp(pSection->type, "ENTITIES")) {
         printf("%*c\"entities\": [\n", (indentLevel + 1) * 2, space);
         for (pEntity = pSection->pEntityHead; pEntity; pEntity = pEntity->next) {
@@ -224,27 +226,37 @@ void sectionConvert2JSON(Section* pSection, int indentLevel, bool last) {
 void entityConvert2JSON(Entity* pEntity, int indentLevel, bool last) {
     char space = ' ';
     printf("%*c{\n", indentLevel * 2, space);
-    printf("%*c\"_end_counter\": %llu\n", (indentLevel + 1) * 2, space, pEntity->endCounter);
-    printf("%*c\"_start_counter\": %llu\n", (indentLevel + 1) * 2, space, pEntity->startCounter);
-    printf("%*c\"color_number\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->color_number);
-    printf("%*c\"handle\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->handle);
-    printf("%*c\"layer_name\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->layer_name);
-    printf("%*c\"linetype_name\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->linetype_name);
-    printf("%*c\"line_weight\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->line_weight);
+    printf("%*c\"_end_counter\": %llu,\n", (indentLevel + 1) * 2, space, pEntity->endCounter);
+    printf("%*c\"_start_counter\": %llu,\n", (indentLevel + 1) * 2, space, pEntity->startCounter);
+    printf("%*c\"color_number\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->color_number);
+    printf("%*c\"handle\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->handle);
+    printf("%*c\"layer_name\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->layer_name);
+    printf("%*c\"linetype_name\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->linetype_name);
+    printf("%*c\"line_weight\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->line_weight);
     if (!strcmp(pEntity->type, "LINE")) {
         int i;
         printf("%*c\"points_x\": {\n", (indentLevel + 1) * 2, space);
-        for (i = 0; i < pEntity->numOfPoins; ++i) {
-            printf("%*c\"%d\": %lf\n", (indentLevel + 2) * 2, space, i + 10, pEntity->points_x[i]);    
+        for (i = 0; i < pEntity->numOfPointsX; ++i) {
+            printf("%*c\"%d\": %lf", (indentLevel + 2) * 2, space, i + 10, pEntity->points_x[i]);
+            if (i == pEntity->numOfPointsX - 1) {
+                printf("\n");
+            } else {
+                printf(",\n");
+            }    
         }
         printf("%*c},\n", (indentLevel + 1) * 2, space);
         printf("%*c\"points_y\": {\n", (indentLevel + 1) * 2, space);
-        for (i = 0; i < pEntity->numOfPoins; ++i) {
-            printf("%*c\"%d\": %lf\n", (indentLevel + 2) * 2, space, i + 10, pEntity->points_y[i]);    
+        for (i = 0; i < pEntity->numOfPointsY; ++i) {
+            printf("%*c\"%d\": %lf", (indentLevel + 2) * 2, space, i + 20, pEntity->points_y[i]);
+            if (i == pEntity->numOfPointsY - 1) {
+                printf("\n");
+            } else {
+                printf(",\n");
+            }     
         }
         printf("%*c},\n", (indentLevel + 1) * 2, space);
     }
-    printf("%*c\"subclass_maker\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->subclass_maker);
+    printf("%*c\"subclass_maker\": \"%s\",\n", (indentLevel + 1) * 2, space, pEntity->subclass_maker);
     printf("%*c\"type\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->type);
     printf("%*c}", indentLevel * 2, space);
     if (last) {
@@ -385,12 +397,14 @@ void dxfProcessEntities(CodeData* pCodeData) {
         break;
     default:
         if (pCodeData->code >= 10 && pCodeData->code <= 18) {
-            entity->points_x[entity->numOfPoins] = atof(pCodeData->data);
-            ++ entity->numOfPoins;        
+            entity->points_x[entity->numOfPointsX] = atof(pCodeData->data);
+            ++ entity->numOfPointsX;        
         } else if (pCodeData->code >= 20 && pCodeData->code <= 28) {
-            entity->points_y[entity->numOfPoins] = atof(pCodeData->data);    
+            entity->points_y[entity->numOfPointsY] = atof(pCodeData->data);
+            ++ entity->numOfPointsY;    
         } else if (pCodeData->code >= 30 && pCodeData->code <= 38) {
-            entity->points_z[entity->numOfPoins] = atof(pCodeData->data);
+            entity->points_z[entity->numOfPointsZ] = atof(pCodeData->data);
+            ++ entity->numOfPointsZ;
         }
     }
 }
