@@ -9,6 +9,7 @@ int main(int argc, char* argv[]) {
         return -1;
     }
     Dxf* root = dxfProcessDocument(f);
+    dxfConvert2JSON(root);
     assert(root);
     fclose(f);
     return 0;

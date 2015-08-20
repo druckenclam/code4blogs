@@ -7,7 +7,7 @@
 
 /* This is a quick prototype for me to understand DXF format. */
 
-#define DEBUG 1
+#define DEBUG 0
 
 /* For the sake of simplicity, assume strings are less than 255 characters */
 #define LONGEST_STRING 255 + 1
@@ -39,9 +39,9 @@ typedef struct Entity {
     char color_number[LONGEST_STRING];      /* Group Code 62 */
     char line_weight[LONGEST_STRING];       /* Group Code 370 */
     
-    char points_x[NUM_OF_POINTS];   
-    char points_y[NUM_OF_POINTS];
-    char points_z[NUM_OF_POINTS];
+    double points_x[NUM_OF_POINTS];   
+    double points_y[NUM_OF_POINTS];
+    double points_z[NUM_OF_POINTS];
     int numOfPoins;
     
     /* Next Pointer */
@@ -65,6 +65,7 @@ typedef struct Section {
 
 /* Root Node */
 typedef struct Dxf {
+    char comments[LONGEST_STRING];
     /* A List of Sections */
     Section* pSectionHead;
     Section* pSectionTail;
@@ -90,8 +91,8 @@ ObjectType objectTypeStack[DEEPEST_STACK];
 int stackSize = 0;
 
 /* Function Prototypes */
-static Entity* makeEntity(void);
-static Section* makeSection(void);
+static Entity* makeEntity(unsigned long long counter);
+static Section* makeSection(unsigned long long counter);
 static Dxf* makeDxf(void);
 static bool isSection(CodeData* pCodeData);
 static void stackPush(StackItem stackItem);
@@ -100,6 +101,8 @@ static void stackPop(void);
 static StackItem stackTop(void);
 static struct CodeData readCodeData(FILE* dxfFile);
 static void dxfProcessEntities(CodeData* pCodeData);
+void sectionConvert2JSON(Section* pSection, int indentLevel, bool last);
+void entityConvert2JSON(Entity* pEntity, int indentLevel, bool last);
 
 /* External Functions */
 Dxf* dxfProcessDocument(FILE* dxfFile) {
@@ -123,7 +126,7 @@ Dxf* dxfProcessDocument(FILE* dxfFile) {
             assert(pDxf); 
             
             /* Create an new section and push into stack */
-            Section* newSection = makeSection();
+            Section* newSection = makeSection(codeData.counter);
             pCurrentSection = newSection;
             
             StackItem newItem = {newSection, Section_OBJ};
@@ -143,7 +146,7 @@ Dxf* dxfProcessDocument(FILE* dxfFile) {
             if (pCurrentSection && (!strcmp(pCurrentSection->type, "ENTITIES"))) { 
                 Entity* pEntity = SAFE_CAST_TO(Entity, stackTop());
                 if (pEntity) {
-                    pEntity->endCounter = codeData.counter;
+                    pEntity->endCounter = codeData.counter - 1;
                 }
                 stackPop();
             }
@@ -153,6 +156,13 @@ Dxf* dxfProcessDocument(FILE* dxfFile) {
             
             stackPop();
             continue;
+        }
+        
+        /* Store Section Type */
+        if (isSection(&codeData)) {
+            Section* pSection = SAFE_CAST_TO(Section, stackTop());
+            assert(pSection);
+            strcpy(pSection->type, codeData.data);
         }
         
         /* Process Code, Data under Entities Section */
@@ -169,13 +179,90 @@ Dxf* dxfProcessDocument(FILE* dxfFile) {
     return root;   
 } 
 
-Entity* makeEntity() {
+void dxfConvert2HTML(Dxf* pDxf) {
+    assert(pDxf);
+        
+}
+
+void dxfConvert2JSON(Dxf* pDxf) {
+    Section* pSection = NULL;
+    printf("{\n");
+    printf("  \"comments\": \"%s\",\n", pDxf->comments);
+    printf("  \"sections\": [\n");
+    for (pSection = pDxf->pSectionHead; pSection; pSection = pSection->next) {
+        sectionConvert2JSON(pSection, 2, pSection == pDxf->pSectionTail);    
+    }
+    printf("  ]\n");
+    printf("}\n");
+}
+
+// Local Function definitions
+void sectionConvert2JSON(Section* pSection, int indentLevel, bool last) {
+    char space = ' ';
+    Entity* pEntity = NULL;
+    printf("%*c{\n", indentLevel * 2, space);
+    printf("%*c\"_end_counter\": %llu\n", (indentLevel + 1) * 2, space, pSection->endCounter);
+    printf("%*c\"_start_counter\": %llu\n", (indentLevel + 1) * 2, space, pSection->startCounter);
+    if (!strcmp(pSection->type, "ENTITIES")) {
+        printf("%*c\"entities\": [\n", (indentLevel + 1) * 2, space);
+        for (pEntity = pSection->pEntityHead; pEntity; pEntity = pEntity->next) {
+            entityConvert2JSON(pEntity, indentLevel + 2, pEntity == pSection->pEntityTail); 
+        }
+        printf("%*c],\n", (indentLevel + 1) * 2, space);     
+    } else {
+        printf("%*c\"entities\": [],\n", (indentLevel + 1) * 2, space);
+    }
+    printf("%*c\"type\": \"%s\"\n", (indentLevel + 1) * 2, space, pSection->type);
+    printf("%*c}", indentLevel * 2, space);
+    if (last) {
+        printf("\n");
+    } else {
+        printf(",\n");
+    }   
+}
+
+void entityConvert2JSON(Entity* pEntity, int indentLevel, bool last) {
+    char space = ' ';
+    printf("%*c{\n", indentLevel * 2, space);
+    printf("%*c\"_end_counter\": %llu\n", (indentLevel + 1) * 2, space, pEntity->endCounter);
+    printf("%*c\"_start_counter\": %llu\n", (indentLevel + 1) * 2, space, pEntity->startCounter);
+    printf("%*c\"color_number\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->color_number);
+    printf("%*c\"handle\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->handle);
+    printf("%*c\"layer_name\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->layer_name);
+    printf("%*c\"linetype_name\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->linetype_name);
+    printf("%*c\"line_weight\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->line_weight);
+    if (!strcmp(pEntity->type, "LINE")) {
+        int i;
+        printf("%*c\"points_x\": {\n", (indentLevel + 1) * 2, space);
+        for (i = 0; i < pEntity->numOfPoins; ++i) {
+            printf("%*c\"%d\": %lf\n", (indentLevel + 2) * 2, space, i + 10, pEntity->points_x[i]);    
+        }
+        printf("%*c},\n", (indentLevel + 1) * 2, space);
+        printf("%*c\"points_y\": {\n", (indentLevel + 1) * 2, space);
+        for (i = 0; i < pEntity->numOfPoins; ++i) {
+            printf("%*c\"%d\": %lf\n", (indentLevel + 2) * 2, space, i + 10, pEntity->points_y[i]);    
+        }
+        printf("%*c},\n", (indentLevel + 1) * 2, space);
+    }
+    printf("%*c\"subclass_maker\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->subclass_maker);
+    printf("%*c\"type\": \"%s\"\n", (indentLevel + 1) * 2, space, pEntity->type);
+    printf("%*c}", indentLevel * 2, space);
+    if (last) {
+        printf("\n");
+    } else {
+        printf(",\n");
+    }  
+}
+
+Entity* makeEntity(unsigned long long counter) {
     Entity* ret = (Entity*) calloc(1, sizeof(Entity));
+    ret->startCounter = counter;
     return ret;
 }
 
-Section* makeSection() {
+Section* makeSection(unsigned long long counter) {
     Section* ret = (Section*) calloc(1, sizeof(Section));
+    ret->startCounter = counter;
     return ret;
 }
 
@@ -184,7 +271,7 @@ Dxf* makeDxf() {
     return ret;    
 }   
 
-static bool isSection(CodeData* pCodeData) {
+bool isSection(CodeData* pCodeData) {
     if (pCodeData->code != 2) return false;
     if (!strcmp(pCodeData->data, "HEADER")) return true;
     if (!strcmp(pCodeData->data, "TABLES")) return true;
@@ -255,14 +342,15 @@ void dxfProcessEntities(CodeData* pCodeData) {
     if (pCodeData->code == 0) {
         Entity* pEntity = SAFE_CAST_TO(Entity, stackTop());
         if (pEntity) {
-            pEntity->endCounter = pCodeData->counter;
+            pEntity->endCounter = pCodeData->counter - 1;
             stackPop();
         }
         
         Section* entities = SAFE_CAST_TO(Section, stackTop());
         assert(entities);
         
-        Entity* newEntity = makeEntity();       
+        Entity* newEntity = makeEntity(pCodeData->counter);
+        strcpy(newEntity->type, pCodeData->data);        
         StackItem newItem = {newEntity, Entity_OBJ};
         stackPush(newItem);
         
