@@ -7,6 +7,8 @@
 
 /* This is a quick prototype for me to understand DXF format. */
 
+#define DEBUG 1
+
 /* For the sake of simplicity, assume strings are less than 255 characters */
 #define LONGEST_STRING 255 + 1
 
@@ -167,17 +169,17 @@ Dxf* dxfProcessDocument(FILE* dxfFile) {
     return root;   
 } 
 
-static Entity* makeEntity() {
+Entity* makeEntity() {
     Entity* ret = (Entity*) calloc(1, sizeof(Entity));
     return ret;
 }
 
-static Section* makeSection() {
+Section* makeSection() {
     Section* ret = (Section*) calloc(1, sizeof(Section));
     return ret;
 }
 
-static Dxf* makeDxf() {
+Dxf* makeDxf() {
     Dxf* ret = (Dxf*) calloc(1, sizeof(Dxf));
     return ret;    
 }   
@@ -201,7 +203,7 @@ void stackPush(StackItem stackItem) {
 }
 
 bool stackEmpty(void) {
-    return stackSize > 0;
+    return stackSize == 0;
 }
 
 void stackPop(void) {
@@ -229,15 +231,23 @@ struct CodeData readCodeData(FILE* dxfFile) {
     /*
         Read code of int type
     */
+    
     char* ret = fgets(codeData.data, LONGEST_STRING, dxfFile);
     assert(ret);
-    codeData.code = atoi(ret);
+    
+    codeData.code = atoi(codeData.data);
     /*
         Read data
     */
     ret = fgets(codeData.data, LONGEST_STRING, dxfFile);
     assert(ret);
-    ++ counter;
+    codeData.data[strlen(codeData.data) - 1] = '\0';
+    
+    if (DEBUG) {
+        fprintf(stderr, "[DBG] %llu: '%d' = '%s'\n", codeData.counter, codeData.code, codeData.data);
+    }
+    
+    ++counter;
     return codeData;
 }
 
