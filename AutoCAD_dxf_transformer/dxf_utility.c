@@ -22,7 +22,7 @@
 ((STACK_ITEM.objectType == CLASS_NAME ## _OBJ) ?((CLASS_NAME*)STACK_ITEM.objectPtr)\
 : NULL)
 
-/* DXF file can be thought of as a serious of key value pairs with
+/* DXF file can be thought of as a series of key value pairs with
  * key on the first line and value on second. "counter", "startCounter", 
  * or "endCounter" are used to count the number of pairs.
  * Those "counters" are easily mapped to line numbers, and vice versa.*/
