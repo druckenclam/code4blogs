@@ -174,6 +174,7 @@ Dxf* dxfProcessDocument(FILE* dxfFile) {
             Section* pSection = SAFE_CAST_TO(Section, stackTop());
             assert(pSection);
             strcpy(pSection->type, codeData.data);
+            continue;
         }
         
         /* Process Code, Data under Entities Section */
