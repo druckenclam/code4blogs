@@ -9,3 +9,6 @@ dxf_transformer.o: dxf_transformer.c dxf_utility.h
 
 dxf_utility.o: dxf_utility.c dxf_utility.h
 	$(COMPILER) -c $(CFLAGS) dxf_utility.c
+
+clean:
+	rm -rf dxf_transformer dxf_transformer.o dxf_utility.o
