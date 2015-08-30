@@ -1,0 +1,15 @@
+CFLAGS=/c -Zi
+COMPILER=cl
+LINKER=link
+
+dxf_transformer: dxf_transformer.obj dxf_utility.obj
+	$(LINKER) -debug dxf_transformer dxf_transformer.obj dxf_utility.obj
+
+dxf_transformer.obj: dxf_transformer.c dxf_utility.h
+	$(COMPILER) $(CFLAGS) dxf_transformer.c
+
+dxf_utility.obj: dxf_utility.c dxf_utility.h
+	$(COMPILER) $(CFLAGS) dxf_utility.c
+
+clean:
+	del -rf dxf_transformer dxf_transformer.obj dxf_utility.obj
