@@ -1,9 +1,10 @@
-CFLAGS=/c -Zi
+CFLAGS=/c -Zi /TC
+LINKFLAGS=/DEBUG
 COMPILER=cl
 LINKER=link
 
 dxf_transformer: dxf_transformer.obj dxf_utility.obj
-	$(LINKER) -debug dxf_transformer dxf_transformer.obj dxf_utility.obj
+	$(LINKER) $(LINKFLAGS) dxf_transformer dxf_transformer.obj dxf_utility.obj
 
 dxf_transformer.obj: dxf_transformer.c dxf_utility.h
 	$(COMPILER) $(CFLAGS) dxf_transformer.c
